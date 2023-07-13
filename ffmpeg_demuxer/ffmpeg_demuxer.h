@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ffmpeg_common.h"
+#include "ffmpeg_demuxer/ffmpeg_common.h"
 #include "media_base/media_demuxer.h"
 
 namespace media_demuxer {
