@@ -1,14 +1,14 @@
-prefix=../../export/ffdecoder/macos
+prefix=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos
 exec_prefix=${prefix}
-libdir=../../export/ffdecoder/macos/lib
-includedir=../../export/ffdecoder/macos/include
+libdir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos/lib
+includedir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos/include
 
 Name: libavcodec
 Description: FFmpeg codec library
 Version: 60.3.100
-Requires: libswresample >= 4.10.100, libavutil >= 58.2.100
+Requires: libavutil >= 58.2.100
 Requires.private: 
 Conflicts:
-Libs: -L${libdir}  -lavcodec -pthread -lm -llzma -L/usr/local/lib -lz
+Libs: -L${libdir}  -lavcodec -pthread -lm -framework VideoToolbox -framework CoreFoundation -framework CoreMedia -framework CoreVideo -framework CoreServices
 Libs.private: 
 Cflags: -I${includedir}

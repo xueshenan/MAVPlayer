@@ -1,7 +1,7 @@
-prefix=../../export/ffdecoder/macos
+prefix=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos
 exec_prefix=${prefix}
-libdir=../../export/ffdecoder/macos/lib
-includedir=../../export/ffdecoder/macos/include
+libdir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos/lib
+includedir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos/include
 
 Name: libavfilter
 Description: FFmpeg audio/video filtering library

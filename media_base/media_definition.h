@@ -25,14 +25,15 @@ struct Rational {
 enum class CodecID {
     CodecIDNone,
     CodecIDH264,
-    CodecIDH265,
+    CodecIDHEVC,
     CodecIDAAC,
     CodecIDAC3,
 };
 
 enum class PixelFormat {
+    PixelFormatNone,
     PixelFormatYUV420P,  ///< planar YUV 4:2:0, 12bpp, (1 Cr & Cb sample per 2x2 Y samples)
-    pixelFormatYUV422P,  ///< planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
+    PixelFormatYUV422P,  ///< planar YUV 4:2:2, 16bpp, (1 Cr & Cb sample per 2x1 Y samples)
     PixelFormatYUV444P,  ///< planar YUV 4:4:4, 24bpp, (1 Cr & Cb sample per 1x1 Y samples)
     PixelFormatNV12,  ///< planar YUV 4:2:0, 12bpp, 1 plane for Y and 1 plane for the UV components, which are interleaved (first byte U and the following byte V)
     PixelFormatRGB24,  ///< packed RGB 8:8:8, 24bpp, RGBRGB
@@ -40,7 +41,7 @@ enum class PixelFormat {
 };
 
 enum class SampleFormat {
-    SampleFormatNone = -1,
+    SampleFormatNone,
     SampleFormatU8,   ///< unsigned 8 bits
     SampleFormatS16,  ///< signed 16 bits
     SampleFormatS32,  ///<signed 32 bits

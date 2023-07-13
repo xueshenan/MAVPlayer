@@ -1,7 +1,7 @@
-prefix=../../export/ffdemuxer/macos/
+prefix=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdemuxer/macos
 exec_prefix=${prefix}
-libdir=../../export/ffdemuxer/macos//lib
-includedir=../../export/ffdemuxer/macos//include
+libdir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdemuxer/macos/lib
+includedir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdemuxer/macos/include
 
 Name: libavcodec
 Description: FFmpeg codec library

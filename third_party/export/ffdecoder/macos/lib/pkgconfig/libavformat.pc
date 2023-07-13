@@ -1,14 +1,14 @@
-prefix=../../export/ffdecoder/macos
+prefix=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos
 exec_prefix=${prefix}
-libdir=../../export/ffdecoder/macos/lib
-includedir=../../export/ffdecoder/macos/include
+libdir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos/lib
+includedir=/Users/tbago/work/goertek/MAVPlayer/third_party/export/ffdecoder/macos/include
 
 Name: libavformat
 Description: FFmpeg container format library
 Version: 60.3.100
-Requires: libavcodec >= 60.3.100, libswresample >= 4.10.100, libavutil >= 58.2.100
+Requires: libavcodec >= 60.3.100, libavutil >= 58.2.100
 Requires.private: 
 Conflicts:
-Libs: -L${libdir}  -lavformat -lm -L/usr/local/lib -lz
+Libs: -L${libdir}  -lavformat -lm -lbz2 -L/usr/local/lib -lz -Wl,-framework,CoreFoundation -Wl,-framework,Security
 Libs.private: 
 Cflags: -I${includedir}

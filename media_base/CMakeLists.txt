@@ -8,4 +8,4 @@ add_library(${MEDIA_BASE_LIBRARY_NAME} STATIC ${MEDIA_BASE_SRC})
 
 target_include_directories(${MEDIA_BASE_LIBRARY_NAME}
     PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../)
+    ${CMAKE_SOURCE_DIR})
