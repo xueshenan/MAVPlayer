@@ -7,9 +7,7 @@ extern "C" {
 #include "libavformat/avformat.h"
 }
 
-namespace demuxer {
-
-extern const AVRational gGloabalTimebase;
+namespace media_demuxer {
 
 /**
  *  Convert ffmpeg codec id to media codec id
@@ -39,4 +37,4 @@ media_base::PixelFormat FFMpegPixelFormatToMediaPixelFormat(enum AVPixelFormat f
 media_base::SampleFormat FFMpegSampleFormatToMediaSampleFormat(
     enum AVSampleFormat ff_sample_format);
 
-}  // namespace demuxer
+}  // namespace media_demuxer

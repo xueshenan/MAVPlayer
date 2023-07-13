@@ -1,6 +1,6 @@
 #include "ffmpeg_common.h"
 
-namespace media_demuxer {
+namespace media_decoder {
 
 media_base::CodecID FFMpegCodecIDToMeidaCodecID(enum AVCodecID ff_codec_id) {
     media_base::CodecID codec_id = media_base::CodecID::CodecIDNone;
@@ -21,6 +21,27 @@ media_base::CodecID FFMpegCodecIDToMeidaCodecID(enum AVCodecID ff_codec_id) {
             break;
     }
     return codec_id;
+}
+
+enum AVCodecID MediaCodecIDToFFMpegCodecID(media_base::CodecID codec_id) {
+    enum AVCodecID ff_codec_id = AV_CODEC_ID_NONE;
+    switch (codec_id) {
+        case media_base::CodecID::CodecIDH264:
+            ff_codec_id = AV_CODEC_ID_H264;
+            break;
+        case media_base::CodecID::CodecIDHEVC:
+            ff_codec_id = AV_CODEC_ID_HEVC;
+            break;
+        case media_base::CodecID::CodecIDAAC:
+            ff_codec_id = AV_CODEC_ID_AAC;
+            break;
+        case media_base::CodecID::CodecIDAC3:
+            ff_codec_id = AV_CODEC_ID_AC3;
+            break;
+        default:
+            break;
+    }
+    return ff_codec_id;
 }
 
 media_base::PixelFormat FFMpegPixelFormatToMediaPixelFormat(enum AVPixelFormat ff_pixel_format) {
@@ -50,44 +71,4 @@ media_base::PixelFormat FFMpegPixelFormatToMediaPixelFormat(enum AVPixelFormat f
     return pixel_format;
 }
 
-media_base::SampleFormat FFMpegSampleFormatToMediaSampleFormat(
-    enum AVSampleFormat ff_sample_format) {
-    media_base::SampleFormat sample_format = media_base::SampleFormat::SampleFormatNone;
-    switch (ff_sample_format) {
-        case AV_SAMPLE_FMT_U8:
-            sample_format = media_base::SampleFormat::SampleFormatU8;
-            break;
-        case AV_SAMPLE_FMT_U8P:
-            sample_format = media_base::SampleFormat::SampleFormatU8P;
-            break;
-        case AV_SAMPLE_FMT_S16:
-            sample_format = media_base::SampleFormat::SampleFormatS16;
-            break;
-        case AV_SAMPLE_FMT_S16P:
-            sample_format = media_base::SampleFormat::SampleFormatS16P;
-            break;
-        case AV_SAMPLE_FMT_S32:
-            sample_format = media_base::SampleFormat::SampleFormatS32;
-            break;
-        case AV_SAMPLE_FMT_S32P:
-            sample_format = media_base::SampleFormat::SampleFormatS32P;
-            break;
-        case AV_SAMPLE_FMT_FLT:
-            sample_format = media_base::SampleFormat::SampleFormatFLT;
-            break;
-        case AV_SAMPLE_FMT_FLTP:
-            sample_format = media_base::SampleFormat::SampleFormatFLTP;
-            break;
-        case AV_SAMPLE_FMT_DBL:
-            sample_format = media_base::SampleFormat::SampleFormatDBL;
-            break;
-        case AV_SAMPLE_FMT_DBLP:
-            sample_format = media_base::SampleFormat::SampleFormatDBLP;
-            break;
-        default:
-            break;
-    }
-    return sample_format;
-}
-
-}  // namespace media_demuxer
+}  // namespace media_decoder

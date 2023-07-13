@@ -21,4 +21,4 @@ add_subdirectory(media_base)
 
 add_subdirectory(ffmpeg_demuxer)
 
-#add_subdirectory(decoder)
+add_subdirectory(ffmpeg_decoder)
