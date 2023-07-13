@@ -1,0 +1,14 @@
+prefix=../../export/ffdemuxer/macos/
+exec_prefix=${prefix}
+libdir=../../export/ffdemuxer/macos//lib
+includedir=../../export/ffdemuxer/macos//include
+
+Name: libavutil
+Description: FFmpeg utility library
+Version: 58.2.100
+Requires: 
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lavutil -pthread -lm -framework VideoToolbox -L/usr/local/Cellar/libx11/1.8.6/lib -lX11 -framework CoreFoundation -framework CoreMedia -framework CoreVideo -framework CoreServices
+Libs.private: 
+Cflags: -I${includedir}

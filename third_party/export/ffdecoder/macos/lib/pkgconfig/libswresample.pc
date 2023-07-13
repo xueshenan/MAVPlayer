@@ -1,0 +1,14 @@
+prefix=../../export/ffdecoder/macos
+exec_prefix=${prefix}
+libdir=../../export/ffdecoder/macos/lib
+includedir=../../export/ffdecoder/macos/include
+
+Name: libswresample
+Description: FFmpeg audio resampling library
+Version: 4.10.100
+Requires: libavutil >= 58.2.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lswresample -lm
+Libs.private: 
+Cflags: -I${includedir}

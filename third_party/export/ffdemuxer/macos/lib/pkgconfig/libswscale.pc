@@ -1,0 +1,14 @@
+prefix=../../export/ffdemuxer/macos/
+exec_prefix=${prefix}
+libdir=../../export/ffdemuxer/macos//lib
+includedir=../../export/ffdemuxer/macos//include
+
+Name: libswscale
+Description: FFmpeg image rescaling library
+Version: 7.1.100
+Requires: libavutil >= 58.2.100
+Requires.private: 
+Conflicts:
+Libs: -L${libdir}  -lswscale -lm
+Libs.private: 
+Cflags: -I${includedir}
