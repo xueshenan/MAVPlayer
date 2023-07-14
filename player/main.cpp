@@ -12,12 +12,31 @@
 const int kWindowWidth = 1280;
 const int kWindowHeight = 720;
 
+void usage(const char *bin_name);
+
 int main(int argc, const char *argv[]) {
-    UNUSED(argc);
-    UNUSED(argv);
+    std::string file_path;
+    for (int i = 1; i < argc; i++) {
+        const std::string current_arg = argv[i];
+        if (current_arg == "-h" || current_arg == "--help") {
+            usage(argv[0]);
+            return 0;
+        } else if (current_arg == "-f" || current_arg == "--file") {
+            if (argc <= i + 1) {
+                usage(argv[0]);
+                return 1;
+            }
+            file_path = std::string(argv[i + 1]);
+            i++;
+        }
+    }
+    if (file_path.size() == 0) {
+        usage(argv[0]);
+        return 1;
+    }
 
     MediaImporter importer;
-    if (!importer.open("/Users/tbago/Desktop/video.sdp")) {
+    if (!importer.open(file_path)) {
         return 1;
     }
 
@@ -81,4 +100,14 @@ int main(int argc, const char *argv[]) {
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
+}
+
+void usage(const char *bin_name) {
+    std::cout << "Usage: " << bin_name << '\n'
+              << '\n'
+              << '\n'
+              << "Options:" << '\n'
+              << "  -h | --help     : show this help" << '\n'
+              << "  -v | --version  : show version information " << '\n'
+              << "  -f | --file     : set the play file path\n";
 }
