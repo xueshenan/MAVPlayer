@@ -9,16 +9,16 @@
 #include "base/unused.h"
 #include "media_importer.h"
 
-const int kWindowWidth = 1280;
-const int kWindowHeight = 720;
-
 void usage(const char *bin_name);
+bool is_integer(const std::string &tested_integer);
 
 int main(int argc, const char *argv[]) {
     std::string file_path;
+    int window_width = 1280;
+    int window_height = 720;
     for (int i = 1; i < argc; i++) {
         const std::string current_arg = argv[i];
-        if (current_arg == "-h" || current_arg == "--help") {
+        if (current_arg == "--help") {
             usage(argv[0]);
             return 0;
         } else if (current_arg == "-f" || current_arg == "--file") {
@@ -28,6 +28,35 @@ int main(int argc, const char *argv[]) {
             }
             file_path = std::string(argv[i + 1]);
             i++;
+        } else if (current_arg == "-w" || current_arg == "--width") {
+            if (argc <= i + 1) {
+                usage(argv[0]);
+                return 1;
+            }
+
+            const std::string width_string(argv[i + 1]);
+            i++;
+            if (!is_integer(width_string)) {
+                usage(argv[0]);
+                return 1;
+            }
+            window_width = std::stoi(width_string);
+        } else if (current_arg == "-h" || current_arg == "--height") {
+            if (argc <= i + 1) {
+                usage(argv[0]);
+                return 1;
+            }
+            const std::string height_string(argv[i + 1]);
+            i++;
+            if (!is_integer(height_string)) {
+                usage(argv[0]);
+                return 1;
+            }
+            window_height = std::stoi(height_string);
+        } else {
+            std::cout << "Invalid arg " << current_arg << std::endl;
+            usage(argv[0]);
+            return 1;
         }
     }
     if (file_path.size() == 0) {
@@ -45,13 +74,13 @@ int main(int argc, const char *argv[]) {
         return -1;
     }
 
-    SDL_Window *window = SDL_CreateWindow("MAVPlayer", 0, SDL_WINDOWPOS_CENTERED, kWindowWidth,
-                                          kWindowHeight, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("MAVPlayer", 0, SDL_WINDOWPOS_CENTERED, window_width,
+                                          window_height, SDL_WINDOW_SHOWN);
     SDL_Rect rect;
     rect.x = 0;
     rect.y = 0;
-    rect.w = kWindowWidth;
-    rect.h = kWindowHeight;
+    rect.w = window_width;
+    rect.h = window_height;
 
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
     if (renderer == NULL) {
@@ -105,9 +134,20 @@ int main(int argc, const char *argv[]) {
 void usage(const char *bin_name) {
     std::cout << "Usage: " << bin_name << '\n'
               << '\n'
-              << '\n'
               << "Options:" << '\n'
-              << "  -h | --help     : show this help" << '\n'
+              << "  --help          : show this help" << '\n'
               << "  -v | --version  : show version information " << '\n'
-              << "  -f | --file     : set the play file path\n";
+              << "  -f | --file     : set the play file path" << '\n'
+              << "  -w | --width    : set window width same as video resolution width" << '\n'
+              << "  -h | --height   : set window height same as video resolution height" << '\n';
+}
+
+bool is_integer(const std::string &tested_integer) {
+    for (const auto &digit : tested_integer) {
+        if (!std::isdigit(digit)) {
+            return false;
+        }
+    }
+
+    return true;
 }

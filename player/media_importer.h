@@ -36,7 +36,7 @@ private:
     std::queue<media_base::CompressedFrame *> _compressed_frame_queue;
 
     mutable std::mutex _last_video_frame_mutex{};
-    mutable media_base::RawVideoFrame *_last_video_frame;
+    mutable media_base::RawVideoFrame *_last_video_frame{nullptr};
 private:
     media_base::MediaDemuxer *_demuxer;
     media_base::MediaDecoder *_decoder;
