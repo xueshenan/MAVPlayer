@@ -48,6 +48,7 @@ media_base::PixelFormat FFMpegPixelFormatToMediaPixelFormat(enum AVPixelFormat f
     media_base::PixelFormat pixel_format = media_base::PixelFormat::PixelFormatNone;
     switch (ff_pixel_format) {
         case AV_PIX_FMT_YUV420P:
+        case AV_PIX_FMT_YUVJ420P:
             pixel_format = media_base::PixelFormat::PixelFormatYUV420P;
             break;
         case AV_PIX_FMT_YUV422P:

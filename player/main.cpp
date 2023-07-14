@@ -17,7 +17,7 @@ int main(int argc, const char *argv[]) {
     UNUSED(argv);
 
     MediaImporter importer;
-    if (!importer.open("/Users/tbago/Desktop/media_resource/b.mov")) {
+    if (!importer.open("/Users/tbago/Desktop/video.sdp")) {
         return 1;
     }
 
@@ -72,7 +72,7 @@ int main(int argc, const char *argv[]) {
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer, texture, NULL, &rect);
             SDL_RenderPresent(renderer);
-            SDL_Delay(10);
+            SDL_Delay(5);
         } else {
             SDL_Delay(1);
         }

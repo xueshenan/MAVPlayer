@@ -43,7 +43,10 @@ bool FFmpegDemuxer::open(const std::string &file_path) {
     //     return false;
     // }
 
-    int ret = avformat_open_input(&_format_context, file_path.c_str(), format, NULL);
+    AVDictionary *dictionary = NULL;
+    av_dict_set(&dictionary, "protocol_whitelist", "file,udp,rtp", 0);
+
+    int ret = avformat_open_input(&_format_context, file_path.c_str(), format, &dictionary);
     if (ret != 0) {
         base::LogError() << "Open input failed";
         return false;
@@ -101,7 +104,13 @@ media_base::CompressedFrame *FFmpegDemuxer::read_frame() {
         }
     } while (true);
 
-    if (has_package && stream_type != media_base::StreamType::StreamTypeUnknown) {
+    // if (stream_type == media_base::StreamType::StreamTypeVideo) {
+    //     base::LogInfo() << "read video stream " << package.size;
+    // }
+
+    // TODO magic number
+    if (has_package && stream_type != media_base::StreamType::StreamTypeUnknown &&
+        package.size > 20) {
         media_base::CompressedFrame *compressed_frame = new media_base::CompressedFrame();
         compressed_frame->type = stream_type;
         compressed_frame->key_frame = package.flags & AV_PKT_FLAG_KEY;
@@ -114,7 +123,6 @@ media_base::CompressedFrame *FFmpegDemuxer::read_frame() {
         compressed_frame->frame_data = (int8_t *)malloc(package.size);
         memcpy(compressed_frame->frame_data, package.data, package.size);
         av_packet_unref(&package);
-
         return compressed_frame;
     }
     return NULL;

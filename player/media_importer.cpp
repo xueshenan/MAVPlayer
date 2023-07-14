@@ -31,7 +31,7 @@ bool MediaImporter::open(const std::string &file_path) {
         codec_param.height = video_stream_info->height;
         codec_param.codec_tag = video_stream_info->codec_tag;
         codec_param.bits_per_coded_sample = video_stream_info->bits_per_coded_sample;
-        codec_param.num_threads = 3;
+        codec_param.num_threads = 4;
         codec_param.extra_data = video_stream_info->extra_data;
         codec_param.extra_data_isze = video_stream_info->extra_data_size;
 
@@ -90,14 +90,14 @@ void MediaImporter::stop_working() {
 void MediaImporter::read_compressed_frame() {
     while (!_should_exit_demuxer) {
         if (_compressed_frame_queue_size > _max_compressed_frame_queue_size) {
-            base::LogWarn() << "Too many compressed frame need consume";
-            std::this_thread::sleep_for(std::chrono::microseconds(1000));
+            // base::LogWarn() << "Too many compressed frame need consume";
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
             continue;
         }
 
         media_base::CompressedFrame *compressed_frame = _demuxer->read_frame();
         if (compressed_frame == nullptr) {
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            //std::this_thread::sleep_for(std::chrono::microseconds(100));
             continue;
         }
 
@@ -105,12 +105,15 @@ void MediaImporter::read_compressed_frame() {
             std::lock_guard<std::mutex> lock(_frame_queue_mutex);
             _compressed_frame_queue.push(compressed_frame);
             _compressed_frame_queue_size = _compressed_frame_queue.size();
-            base::LogDebug() << "frame size " << _compressed_frame_queue_size;
         }
-        std::this_thread::sleep_for(std::chrono::microseconds(5000));
+        // std::this_thread::sleep_for(std::chrono::microseconds(5000));
         //std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
 }
+
+static bool first_decoder = true;
+static auto now = std::chrono::system_clock::now();
+static bool first_frame = true;
 
 void MediaImporter::decode_compressed_frame() {
     while (!_should_exit_decoder) {
@@ -121,19 +124,29 @@ void MediaImporter::decode_compressed_frame() {
         media_base::CompressedFrame *compressed_frame = nullptr;
         {
             std::lock_guard<std::mutex> lock(_frame_queue_mutex);
-            base::LogDebug() << "frame size " << _compressed_frame_queue.size();
             compressed_frame = _compressed_frame_queue.front();
             _compressed_frame_queue.pop();
             _compressed_frame_queue_size = _compressed_frame_queue.size();
         }
 
         media_base::RawVideoFrame *video_frame = NULL;
+        // if (first_decoder) {
+        //     now = std::chrono::system_clock::now();
+        //     first_decoder = false;
+        // }
         if (compressed_frame->type == media_base::StreamType::StreamTypeVideo) {
             video_frame = _decoder->decode_video_frame(compressed_frame);
         }
         delete compressed_frame;
 
         if (video_frame != nullptr) {
+            // if (first_frame) {
+            //     auto current = std::chrono::system_clock::now();
+            //     base::LogError()
+            //         << "time duration "
+            //         << std::chrono::duration_cast<std::chrono::microseconds>(current - now).count();
+            //     first_frame = false;
+            // }
             //replace last video frame
             std::lock_guard<std::mutex> lock(_last_video_frame_mutex);
             // TODO need copy frame for performance
@@ -146,7 +159,7 @@ void MediaImporter::decode_compressed_frame() {
     }
 }
 
-MediaImporter::MediaImporter() : _max_compressed_frame_queue_size(20) {
+MediaImporter::MediaImporter() : _max_compressed_frame_queue_size(120) {
     decoder_enumerator.init();
     _demuxer = media_base::CreateFFmpegDemuxer();
 }

@@ -65,6 +65,7 @@ bool FFmpegDecoder::open_codec(media_base::AVCodecParam *codec_param) {
 
         _avcodec_context->thread_type = thread_type;
         _avcodec_context->thread_count = num_threads;
+        base::LogInfo() << "decoder thread count : " << num_threads;
 
         if (_avcodec->id == AV_CODEC_ID_H264) {
             // If we do not set this, first B-frames before the IDR pictures are dropped.
@@ -135,7 +136,6 @@ media_base::RawVideoFrame *FFmpegDecoder::decode_video_frame(
             return nullptr;
         }
     }
-
     media_base::RawVideoFrame *raw_video_frame = new media_base::RawVideoFrame(
         FFMpegPixelFormatToMediaPixelFormat(_avcodec_context->pix_fmt), decoded_frame->width,
         decoded_frame->height);
