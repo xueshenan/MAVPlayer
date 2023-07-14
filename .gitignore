@@ -21,6 +21,3 @@ build
 
 # vscode settings
 .vscode
-
-# project speical
-ffmpeg
