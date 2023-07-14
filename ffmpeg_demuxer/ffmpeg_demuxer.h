@@ -5,7 +5,7 @@
 
 namespace media_demuxer {
 
-class FFMpegDemuxer : public media_base::MediaDemuxer {
+class FFmpegDemuxer : public media_base::MediaDemuxer {
 public:  // media_base::MediaDemuxer interface
     virtual bool open(const std::string &file_path) override;
     virtual void close() override;
@@ -14,8 +14,8 @@ public:  // media_base::MediaDemuxer interface
     virtual int64_t current_timestamp() override;
     virtual bool eof() override;
 public:
-    FFMpegDemuxer();
-    virtual ~FFMpegDemuxer();
+    FFmpegDemuxer();
+    virtual ~FFmpegDemuxer();
 private:
     void init_ffmpeg();
     void build_movie_info(const std::string &file_path);
@@ -25,7 +25,5 @@ private:
     media_base::MovieInfo _movie_info;
     bool _eof;
 };
-
-media_base::MediaDemuxer *CreateFFMpegDemuxer();
 
 }  // namespace media_demuxer

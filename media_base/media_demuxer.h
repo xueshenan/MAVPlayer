@@ -40,4 +40,6 @@ public:
     virtual bool eof() = 0;
 };
 
+MediaDemuxer *CreateFFmpegDemuxer();
+
 }  // namespace media_base

@@ -4,23 +4,31 @@
 #include "base/unused.h"
 #include "media_base/compressed_frame.h"
 
+namespace media_base {
+
+MediaDemuxer *CreateFFmpegDemuxer() {
+    media_demuxer::FFmpegDemuxer *demuxer = new media_demuxer::FFmpegDemuxer();
+    return demuxer;
+}
+
+}  // namespace media_base
+
 namespace media_demuxer {
 
 const AVRational gGlobalTimeBase = {1, AV_TIME_BASE};
 
 void ffmpeg_log(void *avcl, int level, const char *fmt, va_list vl);
 
-media_base::MediaDemuxer *CreateFFMpegDemuxer() {
-    FFMpegDemuxer *demuxer = new FFMpegDemuxer();
-    return demuxer;
-}
-
-FFMpegDemuxer::FFMpegDemuxer() {
+FFmpegDemuxer::FFmpegDemuxer() {
     _format_context = NULL;
     init_ffmpeg();
 }
 
-bool FFMpegDemuxer::open(const std::string &file_path) {
+FFmpegDemuxer::~FFmpegDemuxer() {
+    close();
+}
+
+bool FFmpegDemuxer::open(const std::string &file_path) {
     close();
 
     const AVInputFormat *format = NULL;
@@ -30,10 +38,10 @@ bool FFMpegDemuxer::open(const std::string &file_path) {
         format = av_find_input_format("live_flv");
     }
 
-    if (format == NULL) {
-        base::LogError() << "Cannot find input stream format";
-        return false;
-    }
+    // if (format == NULL) {
+    //     base::LogError() << "Cannot find input stream format";
+    //     return false;
+    // }
 
     int ret = avformat_open_input(&_format_context, file_path.c_str(), format, NULL);
     if (ret != 0) {
@@ -49,18 +57,18 @@ bool FFMpegDemuxer::open(const std::string &file_path) {
     return true;
 }
 
-void FFMpegDemuxer::close() {
+void FFmpegDemuxer::close() {
     if (_format_context != NULL) {
         avformat_close_input(&_format_context);
         _format_context = NULL;
     }
 }
 
-media_base::MovieInfo *FFMpegDemuxer::movie_info() {
+media_base::MovieInfo *FFmpegDemuxer::movie_info() {
     return &_movie_info;
 }
 
-media_base::CompressedFrame *FFMpegDemuxer::read_frame() {
+media_base::CompressedFrame *FFmpegDemuxer::read_frame() {
     AVPacket package;
     bool has_package = false;
     media_base::StreamType stream_type = media_base::StreamType::StreamTypeUnknown;
@@ -112,22 +120,22 @@ media_base::CompressedFrame *FFMpegDemuxer::read_frame() {
     return NULL;
 }
 
-int64_t FFMpegDemuxer::current_timestamp() {
+int64_t FFmpegDemuxer::current_timestamp() {
     //not implement
     return 0;
 }
 
-bool FFMpegDemuxer::eof() {
+bool FFmpegDemuxer::eof() {
     //not implement
     return false;
 }
 
-void FFMpegDemuxer::init_ffmpeg() {
+void FFmpegDemuxer::init_ffmpeg() {
     av_log_set_callback(ffmpeg_log);
     avformat_network_init();
 }
 
-void FFMpegDemuxer::build_movie_info(const std::string &file_path) {
+void FFmpegDemuxer::build_movie_info(const std::string &file_path) {
     _movie_info.name = file_path;
     _movie_info.format = _format_context->iformat->name;
 
@@ -173,7 +181,7 @@ void FFMpegDemuxer::build_movie_info(const std::string &file_path) {
         }
 
         else if (codec_param->codec_type == AVMEDIA_TYPE_VIDEO) {
-            stream_info->type = media_base::StreamType::StreamTypeUnknown;
+            stream_info->type = media_base::StreamType::StreamTypeVideo;
             stream_info->width = codec_param->width;
             stream_info->height = codec_param->height;
             stream_info->pixel_format =
@@ -249,7 +257,7 @@ void FFMpegDemuxer::build_movie_info(const std::string &file_path) {
     }
 }
 
-bool FFMpegDemuxer::is_valid_framerate(int32_t numerator, int32_t denominator) {
+bool FFmpegDemuxer::is_valid_framerate(int32_t numerator, int32_t denominator) {
     double framerateValue = 1.0 * numerator / denominator;
     if (framerateValue >= 360 || framerateValue < 1) {
         return false;
@@ -264,7 +272,6 @@ void ffmpeg_log(void *avcl, int level, const char *fmt, va_list vl) {
     UNUSED(avcl);
     char buffer[256];
     vsnprintf(buffer, 256, fmt, vl);
-    printf("ffmpeg demuxer :%s", buffer);
     if (level == AV_LOG_WARNING) {
         base::LogWarn() << buffer;
     } else if (level == AV_LOG_ERROR) {
@@ -272,7 +279,7 @@ void ffmpeg_log(void *avcl, int level, const char *fmt, va_list vl) {
     } else if (level == AV_LOG_FATAL) {
         base::LogError() << buffer;
     } else if (level == AV_LOG_TRACE || level == AV_LOG_DEBUG) {
-        base::LogDebug() << buffer;
+        // base::LogDebug() << buffer;
     }
 }
 

@@ -48,6 +48,14 @@ void FFmpegDecoderEnumerator::init() {
             _codec_infos.push_back(codec_info);
         }
     } while (av_codec != NULL);
+    //todo need more work
+    FFmpegCodecInfo *codec_info = new FFmpegCodecInfo();
+    codec_info->type = media_base::DecoderType::DecoderTypeVideo;
+    codec_info->codec_id = FFMpegCodecIDToMeidaCodecID(AV_CODEC_ID_H264);
+    codec_info->name = "H264";
+    codec_info->score = 100;
+
+    _codec_infos.push_back(codec_info);
 }
 
 media_base::MediaDecoder *FFmpegDecoderEnumerator::create_decoder_by_codec_id(
