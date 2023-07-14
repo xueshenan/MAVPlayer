@@ -1,6 +1,7 @@
 #include "media_base/stream_info.h"
 
 #include <cstdlib>
+#include <cstring>
 
 namespace media_base {
 

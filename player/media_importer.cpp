@@ -13,13 +13,10 @@ bool MediaImporter::open(const std::string &file_path) {
     media_base::MovieInfo *movie_info = _demuxer->movie_info();
 
     media_base::StreamInfo *video_stream_info = nullptr;
-    media_base::StreamInfo *audio_stream_info = nullptr;
     for (media_base::StreamInfo *stream_info : movie_info->streams) {
         if (stream_info->type == media_base::StreamType::StreamTypeVideo) {
             video_stream_info = stream_info;
-        } else if (stream_info->type == media_base::StreamType::StreamTypeAudio) {
-            audio_stream_info = stream_info;
-        }
+        }    
     }
     if (video_stream_info == nullptr) {
         base::LogError() << "Not found video stream";

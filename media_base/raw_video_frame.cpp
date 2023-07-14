@@ -1,5 +1,9 @@
 #include "media_base/raw_video_frame.h"
 
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+
 namespace media_base {
 
 RawVideoFrame::RawVideoFrame(PixelFormat pixel_format, int32_t width, int32_t height)
