@@ -2,6 +2,8 @@
 
 #include "base/log.h"
 
+const int kDefaultCompressedFrameBufferSize = 120;
+
 bool MediaImporter::open(const std::string &file_path) {
     if (!_demuxer->open(file_path)) {
         return false;
@@ -54,11 +56,12 @@ media_base::RawVideoFrame *MediaImporter::read_frame() {
 
 void MediaImporter::start_working() {
     stop_working();
-    _should_exit_demuxer = false;
-    _demuxer_thread = new std::thread(&MediaImporter::read_compressed_frame, this);
 
     _should_exit_decoder = false;
     _decoder_thread = new std::thread(&MediaImporter::decode_compressed_frame, this);
+
+    _should_exit_demuxer = false;
+    _demuxer_thread = new std::thread(&MediaImporter::read_compressed_frame, this);
 }
 
 void MediaImporter::stop_working() {
@@ -90,7 +93,7 @@ void MediaImporter::stop_working() {
 void MediaImporter::read_compressed_frame() {
     while (!_should_exit_demuxer) {
         if (_compressed_frame_queue_size > _max_compressed_frame_queue_size) {
-            // base::LogWarn() << "Too many compressed frame need consume";
+            base::LogWarn() << "Too many compressed frame need consume";
             std::this_thread::sleep_for(std::chrono::microseconds(100));
             continue;
         }
@@ -111,9 +114,9 @@ void MediaImporter::read_compressed_frame() {
     }
 }
 
-static bool first_decoder = true;
-static auto now = std::chrono::system_clock::now();
-static bool first_frame = true;
+// static bool first_decoder = true;
+// static auto now = std::chrono::system_clock::now();
+// static bool first_frame = true;
 
 void MediaImporter::decode_compressed_frame() {
     while (!_should_exit_decoder) {
@@ -159,7 +162,8 @@ void MediaImporter::decode_compressed_frame() {
     }
 }
 
-MediaImporter::MediaImporter() : _max_compressed_frame_queue_size(120) {
+MediaImporter::MediaImporter()
+    : _max_compressed_frame_queue_size(kDefaultCompressedFrameBufferSize) {
     decoder_enumerator.init();
     _demuxer = media_base::CreateFFmpegDemuxer();
 }

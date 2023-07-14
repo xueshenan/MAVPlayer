@@ -30,6 +30,7 @@ private:  // backend work thread
     std::atomic<bool> _should_exit_decoder{false};
 private:
     const int32_t _max_compressed_frame_queue_size;
+
     std::mutex _frame_queue_mutex{};
     std::atomic<int32_t> _compressed_frame_queue_size;
     std::queue<media_base::CompressedFrame *> _compressed_frame_queue;

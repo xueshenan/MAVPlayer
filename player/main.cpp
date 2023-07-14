@@ -51,6 +51,7 @@ int main(int argc, const char *argv[]) {
     SDL_Event event;
 
     importer.start_working();
+
     while (!isquit) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
