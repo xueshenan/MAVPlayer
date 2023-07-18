@@ -46,6 +46,7 @@ bool FFmpegDemuxer::open(const std::string &file_path) {
     AVDictionary *dictionary = NULL;
     av_dict_set(&dictionary, "protocol_whitelist", "file,udp,rtp", 0);
     av_dict_set(&dictionary, "probesize", "32", 0);
+    av_dict_set(&dictionary, "fflags", "nobuffer", 0);
 
     int ret = avformat_open_input(&_format_context, file_path.c_str(), format, &dictionary);
     if (ret != 0) {

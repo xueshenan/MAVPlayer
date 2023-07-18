@@ -11,6 +11,7 @@
 #include "media_base/media_decoder.h"
 #include "media_base/media_demuxer.h"
 #include "media_base/raw_video_frame.h"
+#include "base/readerwriterqueue.h"
 
 class MediaImporter {
 public:
@@ -30,11 +31,13 @@ private:  // backend work thread
     std::atomic<bool> _should_exit_decoder{false};
 private:
     const int32_t _max_compressed_frame_queue_size;
-
+    
+    moodycamel::ReaderWriterQueue<media_base::CompressedFrame *> _compressed_frame_queue;
+/*
     std::mutex _frame_queue_mutex{};
     std::atomic<int32_t> _compressed_frame_queue_size;
     std::queue<media_base::CompressedFrame *> _compressed_frame_queue;
-
+*/
     mutable std::mutex _last_video_frame_mutex{};
     mutable media_base::RawVideoFrame *_last_video_frame{nullptr};
 private:

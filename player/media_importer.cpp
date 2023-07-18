@@ -77,28 +77,22 @@ void MediaImporter::stop_working() {
     }
 
     {
-        std::lock_guard<std::mutex> lock(_frame_queue_mutex);
-        while (!_compressed_frame_queue.empty()) {
-            media_base::CompressedFrame *compressed_frame = _compressed_frame_queue.front();
-            _compressed_frame_queue.pop();
+        media_base::CompressedFrame *compressed_frame = nullptr;
+        while (_compressed_frame_queue.try_dequeue(compressed_frame)) {
             delete compressed_frame;
         }
-        _compressed_frame_queue_size = 0;
     }
 }
 
 void MediaImporter::read_compressed_frame() {
     while (!_should_exit_demuxer) {
-        if (_compressed_frame_queue_size > _max_compressed_frame_queue_size) {
+        if (_compressed_frame_queue.size_approx() > (size_t)_max_compressed_frame_queue_size) {
             base::LogWarn() << "Too many compressed frame need consume";
             {  // clear all package
-                std::lock_guard<std::mutex> lock(_frame_queue_mutex);
-                while (!_compressed_frame_queue.empty()) {
-                    media_base::CompressedFrame *compressed_frame = _compressed_frame_queue.front();
-                    _compressed_frame_queue.pop();
+                media_base::CompressedFrame *compressed_frame = nullptr;
+                while (_compressed_frame_queue.try_dequeue(compressed_frame)) {
                     delete compressed_frame;
                 }
-                _compressed_frame_queue_size = 0;
             }
             continue;
         }
@@ -109,11 +103,7 @@ void MediaImporter::read_compressed_frame() {
             continue;
         }
 
-        {
-            std::lock_guard<std::mutex> lock(_frame_queue_mutex);
-            _compressed_frame_queue.push(compressed_frame);
-            _compressed_frame_queue_size = _compressed_frame_queue.size();
-        }
+        { _compressed_frame_queue.try_enqueue(compressed_frame); }
         // std::this_thread::sleep_for(std::chrono::microseconds(5000));
         //std::this_thread::sleep_for(std::chrono::microseconds(100));
     }
@@ -125,16 +115,12 @@ void MediaImporter::read_compressed_frame() {
 
 void MediaImporter::decode_compressed_frame() {
     while (!_should_exit_decoder) {
-        if (_compressed_frame_queue_size == 0) {
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
-            continue;
-        }
         media_base::CompressedFrame *compressed_frame = nullptr;
         {
-            std::lock_guard<std::mutex> lock(_frame_queue_mutex);
-            compressed_frame = _compressed_frame_queue.front();
-            _compressed_frame_queue.pop();
-            _compressed_frame_queue_size = _compressed_frame_queue.size();
+            if (!_compressed_frame_queue.try_dequeue(compressed_frame)) {
+                std::this_thread::sleep_for(std::chrono::microseconds(100));
+                continue;
+            }
         }
 
         media_base::RawVideoFrame *video_frame = NULL;
