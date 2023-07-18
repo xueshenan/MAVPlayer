@@ -16,7 +16,7 @@ bool MediaImporter::open(const std::string &file_path) {
     for (media_base::StreamInfo *stream_info : movie_info->streams) {
         if (stream_info->type == media_base::StreamType::StreamTypeVideo) {
             video_stream_info = stream_info;
-        }    
+        }
     }
     if (video_stream_info == nullptr) {
         base::LogError() << "Not found video stream";
@@ -91,7 +91,15 @@ void MediaImporter::read_compressed_frame() {
     while (!_should_exit_demuxer) {
         if (_compressed_frame_queue_size > _max_compressed_frame_queue_size) {
             base::LogWarn() << "Too many compressed frame need consume";
-            std::this_thread::sleep_for(std::chrono::microseconds(100));
+            {  // clear all package
+                std::lock_guard<std::mutex> lock(_frame_queue_mutex);
+                while (!_compressed_frame_queue.empty()) {
+                    media_base::CompressedFrame *compressed_frame = _compressed_frame_queue.front();
+                    _compressed_frame_queue.pop();
+                    delete compressed_frame;
+                }
+                _compressed_frame_queue_size = 0;
+            }
             continue;
         }
 
