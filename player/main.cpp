@@ -82,7 +82,13 @@ int main(int argc, const char *argv[]) {
     rect.w = window_width;
     rect.h = window_height;
 
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
+    /*
+    SDL_RENDERER_SOFTWARE ：使用软件渲染
+    SDL_RENDERER_ACCELERATED ：使用硬件加速
+    SDL_RENDERER_PRESENTVSYNC：和显示器的刷新率同步
+    SDL_RENDERER_TARGETTEXTURE ：暂不明确
+    */
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL) {
         base::LogError() << "Cannot create render";
         return 1;
