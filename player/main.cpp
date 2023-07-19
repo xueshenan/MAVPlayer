@@ -124,12 +124,10 @@ int main(int argc, const char *argv[]) {
                                  video_frame->frame_buffers[2]->line_size);
             delete video_frame;
 
-            SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer, texture, NULL, &rect);
             SDL_RenderPresent(renderer);
-            SDL_Delay(5);
         } else {
-            SDL_Delay(1);
+            std::this_thread::sleep_for(std::chrono::microseconds(10));
         }
     }
     SDL_DestroyWindow(window);

@@ -8,6 +8,8 @@ bool MediaImporter::open(const std::string &file_path) {
     if (!_demuxer->open(file_path)) {
         return false;
     }
+    unsigned int hardware_core = std::thread::hardware_concurrency();
+    base::LogInfo() << "cpu core count : " << hardware_core;
     base::LogInfo() << "open demux success, file path:" << file_path;
 
     media_base::MovieInfo *movie_info = _demuxer->movie_info();
@@ -30,7 +32,7 @@ bool MediaImporter::open(const std::string &file_path) {
         codec_param.height = video_stream_info->height;
         codec_param.codec_tag = video_stream_info->codec_tag;
         codec_param.bits_per_coded_sample = video_stream_info->bits_per_coded_sample;
-        codec_param.num_threads = 4;
+        codec_param.num_threads = 1;
         codec_param.extra_data = video_stream_info->extra_data;
         codec_param.extra_data_isze = video_stream_info->extra_data_size;
 
@@ -43,6 +45,9 @@ bool MediaImporter::open(const std::string &file_path) {
 }
 
 media_base::RawVideoFrame *MediaImporter::read_frame() {
+    if (!_need_refresh) {
+        return nullptr;
+    }
     std::lock_guard<std::mutex> lock(_last_video_frame_mutex);
     if (_last_video_frame == nullptr) {
         return nullptr;
@@ -143,12 +148,12 @@ void MediaImporter::decode_compressed_frame() {
             // }
             //replace last video frame
             std::lock_guard<std::mutex> lock(_last_video_frame_mutex);
-            // TODO need copy frame for performance
             if (_last_video_frame != nullptr) {
                 delete _last_video_frame;
                 _last_video_frame = nullptr;
             }
             _last_video_frame = video_frame;
+            _need_refresh = true;
         }
     }
 }
@@ -159,4 +164,6 @@ MediaImporter::MediaImporter()
     _demuxer = media_base::CreateFFmpegDemuxer();
 }
 
-MediaImporter::~MediaImporter() {}
+MediaImporter::~MediaImporter() {
+    stop_working();
+}
