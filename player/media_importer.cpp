@@ -32,7 +32,7 @@ bool MediaImporter::open(const std::string &file_path) {
         codec_param.height = video_stream_info->height;
         codec_param.codec_tag = video_stream_info->codec_tag;
         codec_param.bits_per_coded_sample = video_stream_info->bits_per_coded_sample;
-        codec_param.num_threads = 1;
+        codec_param.num_threads = 2;
         codec_param.extra_data = video_stream_info->extra_data;
         codec_param.extra_data_isze = video_stream_info->extra_data_size;
 
@@ -144,8 +144,8 @@ void MediaImporter::decode_compressed_frame() {
 
         if (video_frame != nullptr) {
             out_frame_count++;
-            std::cout << "in frame : " << in_frame_count << " out frame : " << out_frame_count
-                      << std::endl;
+            // std::cout << "in frame : " << in_frame_count << " out frame : " << out_frame_count
+            //           << " diff : " << in_frame_count - out_frame_count << std::endl;
             // if (first_frame) {
             //     auto current = std::chrono::system_clock::now();
             //     base::LogError()

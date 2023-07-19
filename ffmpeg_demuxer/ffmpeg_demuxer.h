@@ -24,6 +24,7 @@ private:
     AVFormatContext *_format_context;
     media_base::MovieInfo _movie_info;
     bool _eof;
+    bool _got_key_frame;
 };
 
 }  // namespace media_demuxer

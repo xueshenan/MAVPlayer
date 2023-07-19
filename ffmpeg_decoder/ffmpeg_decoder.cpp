@@ -100,7 +100,7 @@ media_base::RawVideoFrame *FFmpegDecoder::decode_video_frame(
         pData = (uint8_t *)compressed_frame->frame_data;
         dts = compressed_frame->dts;
         pts = compressed_frame->pts;
-        flags = compressed_frame->key_frame;
+        flags = compressed_frame->key_frame ? AV_PKT_FLAG_KEY : 0;
         pos = compressed_frame->position;
 
     } else {  //Flush decoder

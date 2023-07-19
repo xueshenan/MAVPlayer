@@ -6,6 +6,8 @@
 
 namespace media_base {
 
+//static inline bool H264FourByteStartCode(const char *buf);
+
 MediaDemuxer *CreateFFmpegDemuxer() {
     media_demuxer::FFmpegDemuxer *demuxer = new media_demuxer::FFmpegDemuxer();
     return demuxer;
@@ -47,6 +49,7 @@ bool FFmpegDemuxer::open(const std::string &file_path) {
     build_movie_info(file_path);
 
     _eof = false;
+    _got_key_frame = false;
     return true;
 }
 
@@ -63,9 +66,6 @@ media_base::MovieInfo *FFmpegDemuxer::movie_info() {
 
 media_base::CompressedFrame *FFmpegDemuxer::read_frame() {
     AVPacket package;
-    bool has_package = false;
-    media_base::StreamType stream_type = media_base::StreamType::StreamTypeUnknown;
-
     do {
         int ret = av_read_frame(_format_context, &package);
         if (ret < 0) {
@@ -76,33 +76,20 @@ media_base::CompressedFrame *FFmpegDemuxer::read_frame() {
                 break;
             }
         } else {
-            ///< check is video frame or audio frame
-            ///< for now only support video and audio frame, also not support multi video audio stream
-            AVCodecParameters *codec_param =
-                _format_context->streams[package.stream_index]->codecpar;
-            if (codec_param->codec_type == AVMEDIA_TYPE_VIDEO) {
-                stream_type = media_base::StreamType::StreamTypeVideo;
-                has_package = true;
-                break;
-            } else if (codec_param->codec_type == AVMEDIA_TYPE_AUDIO) {
-                stream_type = media_base::StreamType::StreamTypeAudio;
-                has_package = true;
-                break;
-            } else {
-                continue;
+            if (!_got_key_frame) {
+                if (package.flags & AV_PKT_FLAG_KEY) {
+                    _got_key_frame = true;
+                } else {
+                    continue;
+                }
             }
         }
-    } while (true);
-
-    // if (stream_type == media_base::StreamType::StreamTypeVideo) {
-    //     base::LogInfo() << "read video stream " << package.size;
-    // }
+    } while (0);
 
     // TODO magic number
-    if (has_package && stream_type != media_base::StreamType::StreamTypeUnknown &&
-        package.size > 20) {
+    if (package.size > 20) {
         media_base::CompressedFrame *compressed_frame = new media_base::CompressedFrame();
-        compressed_frame->type = stream_type;
+        compressed_frame->type = media_base::StreamType::StreamTypeVideo;
         compressed_frame->key_frame = package.flags & AV_PKT_FLAG_KEY;
         //TODO need convert timestamp
         compressed_frame->pts = package.pts;
@@ -280,5 +267,13 @@ void ffmpeg_log(void *avcl, int level, const char *fmt, va_list vl) {
         // base::LogDebug() << buffer;
     }
 }
+
+//////////////// H264 Help function ////////////////////////
+// static inline bool H264FourByteStartCode(const char *buf) {
+//     if (buf[0] == 0x00 && buf[1] == 0x00 && buf[2] == 0x00 && buf[3] == 0x01) {
+//         return true;
+//     }
+//     return false;
+// }
 
 }  // namespace media_demuxer
