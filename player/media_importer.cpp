@@ -118,27 +118,34 @@ void MediaImporter::read_compressed_frame() {
 // static auto now = std::chrono::system_clock::now();
 // static bool first_frame = true;
 
+static int in_frame_count = 0;
+static int out_frame_count = 0;
 void MediaImporter::decode_compressed_frame() {
     while (!_should_exit_decoder) {
         media_base::CompressedFrame *compressed_frame = nullptr;
         {
             if (!_compressed_frame_queue.try_dequeue(compressed_frame)) {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
                 continue;
             }
         }
 
-        media_base::RawVideoFrame *video_frame = NULL;
+        media_base::RawVideoFrame *video_frame = nullptr;
         // if (first_decoder) {
         //     now = std::chrono::system_clock::now();
         //     first_decoder = false;
         // }
-        if (compressed_frame->type == media_base::StreamType::StreamTypeVideo) {
-            video_frame = _decoder->decode_video_frame(compressed_frame);
+        if (compressed_frame != nullptr) {
+            in_frame_count++;
         }
-        delete compressed_frame;
+        video_frame = _decoder->decode_video_frame(compressed_frame);
+        if (compressed_frame != nullptr) {
+            delete compressed_frame;
+        }
 
         if (video_frame != nullptr) {
+            out_frame_count++;
+            std::cout << "in frame : " << in_frame_count << " out frame : " << out_frame_count
+                      << std::endl;
             // if (first_frame) {
             //     auto current = std::chrono::system_clock::now();
             //     base::LogError()

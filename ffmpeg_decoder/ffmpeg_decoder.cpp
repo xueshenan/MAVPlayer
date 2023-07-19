@@ -66,17 +66,14 @@ bool FFmpegDecoder::open_codec(media_base::AVCodecParam *codec_param) {
         _avcodec_context->thread_type = thread_type;
         _avcodec_context->thread_count = num_threads;
         base::LogInfo() << "decoder thread count : " << num_threads;
-
-        if (_avcodec->id == AV_CODEC_ID_H264) {
-            // If we do not set this, first B-frames before the IDR pictures are dropped.
-            _avcodec_context->has_b_frames = 1;
-        }
         _avcodec_context->codec_tag = codec_param->codec_tag;
 
     } else if (_codec_info.type == media_base::DecoderType::DecoderTypeAudio) {
     }
 
-    int ret = avcodec_open2(_avcodec_context, _avcodec, NULL);
+    AVDictionary *opts = NULL;
+    av_dict_set(&opts, "flags", "low_delay", 0);
+    int ret = avcodec_open2(_avcodec_context, _avcodec, &opts);
     if (ret < 0) {
         base::LogError() << "Cannot open decoder";
         return false;
@@ -94,7 +91,7 @@ media_base::RawVideoFrame *FFmpegDecoder::decode_video_frame(
     int flags = 0;
     int64_t pos = -1;
 
-    if (compressed_frame != NULL) {
+    if (compressed_frame != nullptr) {
         size = compressed_frame->frame_data_size;
         if (size < 2) {
             base::LogWarn() << "frame size too small";

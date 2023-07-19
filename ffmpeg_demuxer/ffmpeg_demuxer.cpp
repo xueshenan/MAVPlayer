@@ -30,32 +30,20 @@ FFmpegDemuxer::~FFmpegDemuxer() {
 
 bool FFmpegDemuxer::open(const std::string &file_path) {
     close();
-
-    const AVInputFormat *format = NULL;
-    if (file_path.find("rtsp://") == 0) {
-        format = av_find_input_format("rtsp");
-    } else if (file_path.find("rtmp://") == 0) {
-        format = av_find_input_format("live_flv");
-    }
-
-    // if (format == NULL) {
-    //     base::LogError() << "Cannot find input stream format";
-    //     return false;
-    // }
-
     AVDictionary *dictionary = NULL;
     av_dict_set(&dictionary, "protocol_whitelist", "file,udp,rtp", 0);
     av_dict_set(&dictionary, "probesize", "32", 0);
-    av_dict_set(&dictionary, "fflags", "nobuffer", 0);
+    // av_dict_set(&dictionary, "fflags", "nobuffer", 0);                    //AVFMT_FLAG_NOBUFFER
+    // av_dict_set(&dictionary, "fflags", "flush_packets", AV_DICT_APPEND);  //AVFMT_FLAG_FLUSH_PACKETS
 
-    int ret = avformat_open_input(&_format_context, file_path.c_str(), format, &dictionary);
+    int ret = avformat_open_input(&_format_context, file_path.c_str(), NULL, &dictionary);
     if (ret != 0) {
         base::LogError() << "Open input failed";
         return false;
     }
 
+    _format_context->flags = AVFMT_FLAG_NOBUFFER | AVFMT_FLAG_FLUSH_PACKETS;
     avformat_find_stream_info(_format_context, NULL);
-
     build_movie_info(file_path);
 
     _eof = false;
